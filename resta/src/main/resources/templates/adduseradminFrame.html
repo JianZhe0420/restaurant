@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>adduseradminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<form id="form" name="form" action="" method="post" th:action="@{/adduser}">
+    <div id="loginBox">
+            员工姓名：<input type="text" name="username" id="username" size="20" required="required">
+            <br>
+            电&nbsp&nbsp&nbsp&nbsp&nbsp话&nbsp：&nbsp<input type="text" name="usertel" id="usertel"  size="11" required="required">
+            <br>
+            密&nbsp&nbsp&nbsp&nbsp&nbsp码&nbsp：&nbsp<input type="password" name="userpas" id="userpas"  size="25" required="required">
+            <br>
+            <select id="usertype" name="usertype" style="float:left">
+                <option selected="selected" value="前台">前台</option>
+                <option value="后厨">后厨</option>
+            </select>
+            <br>
+            <input type = "submit" id="submit" value="提交">
+    </div>
+</form>
+</body>
+<script th:inline="javascript">
+    $("#username").blur(function () {
+        var username=document.getElementById("username").value
+        if(username!=""){
+            $.ajax({
+                url: "cheakusernameajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: username,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    if (data == "in") {
+                        alert("此姓名已存在！")
+                        document.getElementById("username").value=""
+                    }
+                },
+                error() {
+                }
+            })
+        }
+    })
+</script>
+</html>

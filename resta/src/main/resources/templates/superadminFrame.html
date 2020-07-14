@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>superadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+
+<body style="text-align:center">
+<table border="1" cellspacing="0">
+<tr><th>序号</th><th>姓名</th><th>职位</th><th>密码</th><th>电话</th><th>改动</th></tr>
+<tr th:id="${user.getUserid()}" th:each="user,uu:${userList}" th:if="${user.getUsertype()}==3"><td th:text="${uu.count}"></td><td th:text="${user.getUsername()}"></td><td>管理</td><td th:text="${user.getUserpassword()}"></td><td th:text="${user.getUsertele()}"></td><td><button onclick="删除(this)" th:attr="userid=${user.getUserid()}" style="color: red">删除</button><button onclick="更改(this)" th:attr="userid=${user.getUserid()},username=${user.getUsername()},usertype=${user.getUsertype()},userpas=${user.getUserpassword()}">更改</button></td></tr>
+<tr th:id="${user.getUserid()}" th:each="user,uu:${userList}" th:if="${user.getUsertype()}==4"><td th:text="${uu.count}"></td><td th:text="${user.getUsername()}"></td><td>超级管理</td><td th:text="${user.getUserpassword()}"></td><td th:text="${user.getUsertele()}"></td><td><button onclick="更改密码(this)" th:attr="userid=${user.getUserid()},username=${user.getUsername()},usertype=${user.getUsertype()},userpas=${user.getUserpassword()}">更改密码</button></td></tr>
+</table>
+<button onclick="新增管理员()">新增管理员</button>
+<br>
+<br>
+<div id="新增管理员区" style="display: none">
+    <form method="post" th:action="@{/addadmin}">
+    管理员姓名：<input id="adminname" name="adminname" type="text" required="required">
+    <br>
+    管理员密码：<input id="adminpass" name="adminpass" type="text" required="required">
+    <br>
+    管理员电话：<input id="admintel" name="admintel" type="text" required="required">
+        <br>
+    <input type = "submit" value="确认新增">
+    </form>
+</div>
+</body>
+<script th:inline="javascript">
+    $(function () {
+        $("#adminname").blur(function () {
+            if (document.getElementById("adminname").value!=""){
+                var adminname=document.getElementById("adminname").value
+                $.ajax({
+                    url: "addadminajax",
+                    contentType: "applicaton/json;charset=UTF-8",
+                    data: adminname,
+                    dataType: "text",
+                    type: "post",
+                    cache: false,
+                    success: function (data) {
+                        if (data=="no"){
+                            alert("此用户名已存在！请更改！")
+                            document.getElementById("adminname").value=""
+                        }
+                    },
+                    error() {
+                    }
+                })
+            }
+        })
+
+    })
+    function 删除(obj) {
+        var uid=obj.getAttribute("userid")
+        $(document.getElementById(uid)).remove()
+        $.ajax({
+            url: "deluseradminajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: uid,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                alert("成功")
+            },
+            error() {
+            }
+        })
+    }
+    function 更改(obj) {
+        var userid=obj.getAttribute("userid")
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="changeadminuseradminFrame?userid="+userid;
+        parent.document.getElementById("nowtype").innerHTML="更改员工信息"
+    }
+    function 更改密码(obj) {
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="changesuperuseradminFrame";
+        parent.document.getElementById("nowtype").innerHTML="更改超级管理员密码"
+    }
+    function 新增管理员() {
+        document.getElementById("新增管理员区").style.display=""
+    }
+</script>
+</html>

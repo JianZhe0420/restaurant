@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>changeuseradminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<form id="form" name="form" action="" method="post" th:action="@{/changeuser}">
+    <div id="loginBox">
+        <input type="text" name="userid" id="userid" th:value="${user.getUserid()}" style="display: none">
+
+        员工姓名：<div th:text="${user.getUsername()}" style="font-weight: bolder"></div>
+        <input type="text" name="username" id="username" th:value="${user.getUsername()}" size="20" required="required" style="display: none">
+        电&nbsp&nbsp&nbsp&nbsp&nbsp话&nbsp：&nbsp<input type="text" name="usertel" id="usertel" th:value="${user.getUsertele()}" size="11" required="required">
+        <br>
+        密&nbsp&nbsp&nbsp&nbsp&nbsp码&nbsp：&nbsp<input type="text" name="userpas" id="userpas"  th:value="${user.getUserpassword()}" size="25" required="required">
+        <br>
+        <select id="usertype" name="usertype" style="float:left">
+            <option selected="selected" value="前台" th:if="${user.getUsertype()}==1">前台</option>
+            <option selected="selected" value="后厨" th:if="${user.getUsertype()}==2">后厨</option>
+            <option value="后厨" th:unless="${user.getUsertype()}==2">后厨</option>
+            <option value="前台" th:unless="${user.getUsertype()}==1">前台</option>
+        </select>
+        <br>
+        <input type = "submit" id="submit" value="提交">
+    </div>
+</form>
+</body>
+<script th:inline="javascript">
+</script>
+</html>

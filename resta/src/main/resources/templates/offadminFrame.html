@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>offadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+赠品类：
+<br>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>折扣名</th><th>打折需达到的满减值</th><th>状态</th><th>改动</th></tr>
+    <tr th:each="off:${off0list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==0"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffmax()}">赠品</td><td>不启用</td><td><button onclick="删除(this)" th:attr="offid=${off.getOffid()}" style="color: red">删除</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+    <tr th:each="off:${off1list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==0"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffmax()}">赠品</td><td>启用</td><td><button onclick="删除(this)" th:attr="offid=${off.getOffid()}" style="color: red">删除</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+</table>
+<br>
+<br>
+满减类：
+<br>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>折扣名</th><th>满</th><th>减</th><th>状态</th><th>改动</th></tr>
+    <tr th:each="off:${off0list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==1"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffmax()}">满减</td><td th:text="${off.getOofsub()}">满减</td><td>不启用</td><td><button onclick="删除(this)" th:attr="offid=${off.getOffid()}" style="color: red">删除</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+    <tr th:each="off:${off1list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==1"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffmax()}">满减</td><td th:text="${off.getOofsub()}">满减</td><td>启用</td><td><button onclick="删除(this)" th:attr="offid=${off.getOffid()}" style="color: red">删除</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+</table>
+<br>
+<br>
+折扣类：
+<br>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>折扣名</th><th>满</th><th>折扣</th><th>状态</th><th>改动</th></tr>
+    <tr th:each="off:${off0list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==2"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffmax()}">满减</td><td th:text="${off.getOffrate()}">满减</td><td>不启用</td><td><button onclick="删除(this)" th:attr="offid=${off.getOffid()}" style="color: red">删除</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+    <tr th:each="off:${off1list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==2"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffmax()}">满减</td><td th:text="${off.getOffrate()}">满减</td><td>启用</td><td><button onclick="删除(this)" th:attr="offid=${off.getOffid()}" style="color: red">删除</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+</table>
+<br>
+会员类：
+<br>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>折扣名</th><th>折扣</th><th>状态</th><th>改动</th></tr>
+    <tr th:each="off:${off0list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==3"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffrate()}">会员</td><td>不启用</td><td><button onclick="更改(this)">更改</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+    <tr th:each="off:${off1list}" th:id="${off.getOffid()}" th:if="${off.getOffType()}==3"><td th:text="${off.getOffid()}"></td><td th:text="${off.getOffname()}"></td><td th:text="${off.getOffrate()}">会员</td><td>启用</td><td><button onclick="更改(this)">更改</button><button onclick="更改状态(this)"  th:attr="offid=${off.getOffid()}">更改状态</button></td></tr>
+
+</table>
+<br>
+<button onclick="新增赠品()">新增赠品</button>
+<button onclick="新增满减()">新增满减</button>
+<button onclick="新增打折()">新增打折</button>
+<br>
+<div id="会员打折率框" style="display: none">
+    会员折扣打折率：<input type="number" min="0.01" max="1" step="0.01" id="会员打折率">
+    <button onclick="确认改变()">确认</button>
+</div>
+
+</body>
+<script th:inline="javascript">
+    function 删除(obj) {
+        var oid=obj.getAttribute("offid")
+        $(document.getElementById(oid)).remove()
+        $.ajax({
+            url: "deloffadminajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: oid,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                alert("成功")
+            },
+            error() {
+                alert("出错")
+            }
+        })
+    }
+    function 更改(obj) {
+        document.getElementById("会员打折率框").style.display=""
+    }
+    function 确认改变() {
+        var orate=document.getElementById("会员打折率").value
+        $.ajax({
+            url: "changevipoffajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: orate,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                alert("成功")
+                document.getElementById("会员打折率").value=""
+                document.getElementById("会员打折率框").style.display="none"
+            },
+            error() {
+                document.getElementById("会员打折率").value=""
+                document.getElementById("会员打折率框").style.display="none"
+            }
+        })
+    }
+    function 更改状态(obj) {
+        var oid=obj.getAttribute("offid")
+        $.ajax({
+            url: "changeoffstatusajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: oid,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                alert("成功")
+                parent.document.getElementById("adminFrame").src="";
+                parent.document.getElementById("adminFrame").src="offadminFrame";
+            },
+            error() {
+                alert("出错")
+                parent.document.getElementById("adminFrame").src="";
+                parent.document.getElementById("adminFrame").src="offadminFrame";
+            }
+        })
+    }
+    function 新增赠品() {
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="addgiftoffadminFrame";
+        parent.document.getElementById("nowtype").innerHTML="新增赠品"
+    }
+    function 新增满减() {
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="addreductionoffadminFrame";
+        parent.document.getElementById("nowtype").innerHTML="新增满减"
+    }
+    function 新增打折() {
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="adddiscountoffadminFrame";
+        parent.document.getElementById("nowtype").innerHTML="新增打折"
+    }
+</script>
+</html>

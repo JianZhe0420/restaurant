@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>shiftshiftadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<div id="block1" style="width: 20%;height: 100%;float: left">
+    查询全部出勤记录：
+    <button onclick="查询全部出勤记录()">查询</button>
+
+
+    <br>
+
+    <HR>
+
+
+按时间查询出勤：
+    <br>
+    起：<input id="开始时间" class="change" type="date" placeholder="开始时间">
+    <br>
+    止：<input id="终止时间" class="change" type="date" placeholder="终止时间">
+    <br>
+    <button onclick="按时间查询出勤()">查询</button>
+    <br>
+
+    <HR>
+    按照员工姓名查询出勤记录：
+    <br>
+        <input id="username" name="username" class="change" placeholder="员工姓名">
+    <button onclick="按照员工姓名查询出勤记录()">查询</button>
+    <br>
+    <br>
+    <HR>
+
+<!--    按时间和员工姓名查询出勤：-->
+<!--    <br>-->
+<!--    起：<input id="和姓名开始时间" class="change" type="date" placeholder="开始时间">-->
+<!--    <br>-->
+<!--    止：<input id="和姓名终止时间" class="change" type="date" placeholder="终止时间">-->
+<!--    <br>-->
+<!--    <button onclick="按时间和员工姓名查询出勤()">查询</button>-->
+<!--    <br>-->
+
+<!--    <HR>-->
+</div>
+<div id="block2" style="width: 80%;height: 100%;float: left">
+    <iframe id="msgFrame" name="msgFrame" style="height:600px;width:100%;" src="shiftadminFrame" >
+    </iframe>
+</div>
+</body>
+<script th:inline="javascript">
+    function 查询全部出勤记录(){
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="shiftadminFrame"
+            $(".change").val("")
+    }
+    function 按时间查询出勤(){
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="shiftbytimeadminFrame?starttime="+document.getElementById("开始时间").value+"&endtime="+document.getElementById("终止时间").value;
+        $(".change").val("")
+    }
+    function 按照员工姓名查询出勤记录() {
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="shiftbyusernameadminFrame?username="+document.getElementById("username").value;
+        $(".change").val("")
+    }
+
+
+</script>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>dishadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>菜名</th><th>所属分类</th><th>库存</th><th>价格</th><th>上架状态</th><th>更改</th></tr>
+    <tr th:each="dish:${dishlist}"  th:if="${dish.getDishstatus()}==0" th:id="${dish.getDishid()}"><td th:text="${dish.getDishid()}"></td><td th:text="${dish.getDishname()}"></td><td><div th:each="dishtype:${dishtypelist}"><div th:if="${dishtype.getDishtypeid()}==${dish.getDishtype()}" th:text="${dishtype.getDishtypename()}"></div></div></td><td th:text="${dish.getDishstock()}"></td><td th:text="${dish.getDishprice()}"></td><td>上架</td><td><button onclick="删除(this)" th:attr="dishid=${dish.getDishid()}" style="color: red">删除</button><button onclick="更改(this)" th:attr="dishid=${dish.getDishid()}">更改</button></td></tr>
+    <tr th:each="dish:${dishlist}"  th:if="${dish.getDishstatus()}==1" th:id="${dish.getDishid()}"><td th:text="${dish.getDishid()}"></td><td th:text="${dish.getDishname()}"></td><td><div th:each="dishtype:${dishtypelist}"><div th:if="${dishtype.getDishtypeid()}==${dish.getDishtype()}" th:text="${dishtype.getDishtypename()}"></div></div></td><td th:text="${dish.getDishstock()}"></td><td th:text="${dish.getDishprice()}"></td><td>未上架</td><td><button onclick="删除(this)" th:attr="dishid=${dish.getDishid()}" style="color: red">删除</button><button onclick="更改(this)" th:attr="dishid=${dish.getDishid()}">更改</button></td></tr>
+
+</table>
+
+<button onclick="新增()">新增</button>
+</body>
+<script th:inline="javascript">
+    function 删除(obj) {
+        var did=obj.getAttribute("dishid")
+        $(document.getElementById(did)).remove()
+        $.ajax({
+            url: "deldishadminajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: did,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+            },
+            error() {
+            }
+        })
+    }
+    function 更改(obj) {
+        var dishid=obj.getAttribute("dishid")
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="changedishadminFrame?dishid="+dishid;
+        parent.document.getElementById("nowtype").innerHTML="更改菜品信息"
+    }
+    function 新增() {
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="adddishadminFrame";
+        parent.document.getElementById("nowtype").innerHTML="新增菜品"
+    }
+</script>
+</html>

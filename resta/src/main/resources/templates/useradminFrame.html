@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>useradminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body style="text-align:center">
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>姓名</th><th>职位</th><th>密码</th><th>电话</th><th>改动</th></tr>
+    <tr th:id="${user.getUserid()}" th:each="user,uu:${userList}" th:if="${user.getUsertype()}==1"><td th:text="${uu.count}"></td><td th:text="${user.getUsername()}"></td><td>前台</td><td th:text="${user.getUserpassword()}"></td><td th:text="${user.getUsertele()}"></td><td><button onclick="删除(this)" th:attr="userid=${user.getUserid()}" style="color: red">删除</button><button onclick="更改(this)" th:attr="userid=${user.getUserid()},username=${user.getUsername()},usertype=${user.getUsertype()},userpas=${user.getUserpassword()}">更改</button></td></tr>
+    <tr th:id="${user.getUserid()}" th:each="user,uu:${userList}" th:if="${user.getUsertype()}==2"><td th:text="${uu.count}"></td><td th:text="${user.getUsername()}"></td><td>后厨</td><td th:text="${user.getUserpassword()}"></td><td th:text="${user.getUsertele()}"></td><td><button onclick="删除(this)" th:attr="userid=${user.getUserid()}" style="color: red">删除</button><button onclick="更改(this)" th:attr="userid=${user.getUserid()},username=${user.getUsername()},usertype=${user.getUsertype()},userpas=${user.getUserpassword()}">更改</button></td></tr>
+    </table>
+<br>
+<button onclick="新增()">新增</button>
+</body>
+<script th:inline="javascript">
+    function 删除(obj) {
+        var uid=obj.getAttribute("userid")
+        $(document.getElementById(uid)).remove()
+        $.ajax({
+            url: "deluseradminajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: uid,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+            },
+            error() {
+            }
+        })
+    }
+    function 更改(obj) {
+        var userid=obj.getAttribute("userid")
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="changeuseradminFrame?userid="+userid;
+        parent.document.getElementById("nowtype").innerHTML="更改员工信息"
+    }
+    function 新增() {
+        parent.document.getElementById("adminFrame").src="";
+        parent.document.getElementById("adminFrame").src="adduseradminFrame";
+        parent.document.getElementById("nowtype").innerHTML="新增员工"
+    }
+</script>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>changetablenumFrame</title>
+    <script src="jquery.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+
+<!--<button id="other" class="other" name="other" th:unless="${typedishlist.isEmpty()}" th:attr="price=${typedish.getDishprice()},stock=${typedish.getDishstock()},dishid=${typedish.getDishname()}" th:text="${typedish.getDishname()}" th:each="typedish:${typedishlist}" style="float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;background-color:rgb(113,181,190);height:25%;width:15%">-->
+<!--</button>-->
+<div th:each="table:${tablelist}" style="margin: 50px 150px 0px 200px">
+    <!--    th:id="table.getTableid()"-->
+    <button name="inthistable" class="can" th:id="${table.getTableid()}" th:if="${table.getTablemsg()}==1" th:text="${table.getTableid()}" style="background-color:rgb(113,181,190);;float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;height:25%;width:15%">
+    </button>
+    <button class="notinthistable" th:id="${table.getTableid()}" onclick="change(this)" th:if="${table.getTablemsg()}==2" th:text="${table.getTableid()}" style="background-color:rgb(61,138,148);;float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;height:25%;width:15%">
+    </button>
+</div>
+
+<button name="input" id="tijao" onclick="input()" style="background-color:rgb(113,181,190);float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin: 0px 150px 0px 200px;font-size:25px;font-weight:bolder;height:25%;width:15%">
+    提交更改</button>
+
+</body>
+<script th:inline="javascript">
+    var inlist=[];
+    function change(obj) {
+        var r=confirm("是否将状态更改为空闲？")
+        if(r==true){
+            $(obj).css("background-color", "rgb(113,181,190)")
+             var id=$(obj).attr("id")
+            inlist.push(id)
+        }
+    }
+
+    function input() {
+        var r=confirm("是否提交更改？")
+        if(r==true){
+            parent.document.getElementById("childFrame").src = "";
+            parent.document.getElementById("childFrame").src = "changetablenumback?inlist=" + inlist;
+            
+            var xxxx=" "
+            $.ajax({
+                url: "cangetablenewnumajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    parent.document.getElementById("tablenum").value==data
+                },
+                error() {
+                }
+            })
+        }
+    }
+
+</script>
+</html>

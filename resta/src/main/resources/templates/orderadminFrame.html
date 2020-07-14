@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>orderadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+
+<div style="float: left">
+订单列表展示：
+</div>
+<br>
+<table border="1" cellspacing="0" style="float: left">
+    <tr><th>序号</th><th>状态</th><th>外卖地址</th><th>收银员</th><th>所用折扣</th><th>类型</th><th>付款方式</th><th>价格</th><th>下单时间</th></tr>
+    <tr th:each="order1,o1:${orderlist}"><td th:text="${o1.count}"></td><td th:text="${order1.getOrderstatus()}"></td><td th:text="${order1.getOrderaddress()}"></td><td><div th:each="user:${userlist}"><div th:if="${user.getUserid()}==${order1.getOrderuser()}" th:text="${user.getUsername()}"></div></div></td><td th:text="${order1.getOrderoffname()}"></td><td th:text="${order1.getOrdertype()}"></td><td th:text="${order1.getOrdermoneytype()}"></td><td th:text="${order1.getOrderprice()}"></td><td th:text="${order1.getOrdertimestring()}"></td></tr>
+</table>
+<br>
+
+</body>
+<script th:inline="javascript">
+</script>
+</html>

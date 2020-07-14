@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>vipadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>会员姓名</th><th>会员电话</th><th>更改</th></tr>
+    <tr th:id="${vip.getVipip()}" th:each="vip:${viplist}"><td th:text="${vip.getVipip()}"></td><td th:text="${vip.getVipname()}"></td><td th:text="${vip.getViptel()}"></td><td><button onclick="删除(this)" th:attr="vipip=${vip.getVipip()}" style="color: red">删除</button></td></tr>
+</table>
+<br>
+<div>
+    会员价格：<div th:text="${vipprice}"></div>￥
+</div>
+<br>
+<button onclick="改变会员价格()">改变会员价格</button>
+<br>
+<div id="会员价格输入框" style="display: none">
+    会员价格：<input type="number" min="0" id="会员价格">
+    <button onclick="确认改变()">确认</button>
+</div>
+</body>
+<script th:inline="javascript">
+    function 删除(obj) {
+        var vipip=obj.getAttribute("vipip")
+        $(document.getElementById(vipip)).remove()
+        $.ajax({
+            url: "delvipajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: vipip,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.document.getElementById("adminFrame").src="";
+                parent.document.getElementById("adminFrame").src="vipadminFrame";
+
+            },
+            error() {
+            }
+        })
+    }
+    function 改变会员价格() {
+        document.getElementById("会员价格输入框").style.display=""
+    }
+    function 确认改变() {
+        var vprice=document.getElementById("会员价格").value
+        $.ajax({
+            url: "changevippriceajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: vprice,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.document.getElementById("adminFrame").src="";
+                parent.document.getElementById("adminFrame").src="vipadminFrame";
+            },
+            error() {
+                document.getElementById("会员价格").value=""
+                document.getElementById("会员价格输入框").style.display="none"
+            }
+        })
+    }
+</script>
+</html>

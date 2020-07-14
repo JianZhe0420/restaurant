@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>changesuperuseradminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+超级管理员
+<br>
+姓名：
+<br>
+<div th:text="${superuser.getUsername()}" style="background-color: #D5B474;width: 10%"></div>
+密码：
+<form id="form" name="form" action="" method="post" th:action="@{/changesuper}">
+<input id="superuserp" name="superuserp" type="text" th:placeholder="${superuser.getUserpassword()}">
+    <br>
+    <input type = "submit" id="submit" value="更改">
+</form>
+</body>
+<script th:inline="javascript">
+</script>
+</html>

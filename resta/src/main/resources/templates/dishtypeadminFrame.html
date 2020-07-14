@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>dishtypeadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>分类名</th><th>更改</th></tr>
+    <tr th:each="dishtype,dt:${dishtypelist}" th:id="${dishtype.getDishtypeid()}"><td th:text="${dt.count}"></td><td th:text="${dishtype.getDishtypename()}"></td><td><button onclick="删除(this)" th:attr="dishtypeid=${dishtype.getDishtypeid()}" style="color: red">删除</button></td></tr>
+</table>
+
+<button onclick="新增()">新增</button>
+<br>
+<div id="新增分类框" style="display: none">
+    分类名称：<input type="text" id="新增分类名称" required="required">
+    <button onclick="确认新增()">确认</button>
+</div>
+</body>
+<script th:inline="javascript">
+    function 删除(obj) {
+        var x=confirm("删除除菜品分类的同时会删除属于该分类的所有菜品！是否执行删除？")
+        if (x==true){
+            var dtid=obj.getAttribute("dishtypeid")
+            var dishtypeid=document.getElementById(dtid)
+            $(dishtypeid).remove()
+            $.ajax({
+                url: "deldishtypeadminajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: dtid,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    alert("成功")
+                },
+                error() {
+                    alert("出错")
+                }
+            })
+        }
+        else{
+        }
+
+    }
+
+    function 新增() {
+        document.getElementById("新增分类框").style.display=""
+    }
+    function 确认新增() {
+        var neme=document.getElementById("新增分类名称").value
+        if(neme==""||neme==" "){
+            alert("输入分类名！")
+            document.getElementById("新增分类框").style.display="none"
+        }
+        else {
+            $.ajax({
+                url: "adddishtypeadminajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: neme,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    if (data=="新增成功"){
+                        alert("新增成功")
+                        parent.document.getElementById("adminFrame").src="";
+                        parent.document.getElementById("adminFrame").src="dishtypeadminFrame";
+                        parent.document.getElementById("nowtype").innerHTML="菜品分类管理"
+                    }
+                    else {
+                        alert("该分类已存在！")
+                                          }
+                },
+                error() {
+                }
+            })
+        }
+    }
+</script>
+</html>

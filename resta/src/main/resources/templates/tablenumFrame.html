@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>tablenumFrame</title>
+    <script src="jquery.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+
+<!--<button id="other" class="other" name="other" th:unless="${typedishlist.isEmpty()}" th:attr="price=${typedish.getDishprice()},stock=${typedish.getDishstock()},dishid=${typedish.getDishname()}" th:text="${typedish.getDishname()}" th:each="typedish:${typedishlist}" style="float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;background-color:rgb(113,181,190);height:25%;width:15%">-->
+<!--</button>-->
+<div th:each="table:${tablelist}" style="margin: 50px 150px 0px 200px">
+<!--    th:id="table.getTableid()"-->
+<button name="inthistable" class="can" onclick="canselect(this)" th:if="${table.getTablemsg()}==1 and ${table.getTableid()}!=${tableid}" th:text="${table.getTableid()}" style="background-color:rgb(113,181,190);;float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;height:25%;width:15%">
+</button>
+<button class="notinthistable" onclick="cannotselect()" th:if="${table.getTablemsg()}==2 and ${table.getTableid()}!=${tableid}" th:text="${table.getTableid()}" style="background-color:rgb(61,138,148);;float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;height:25%;width:15%">
+</button>
+<button name="nowinthistable" class="can" onclick="canselect(this)" th:if="${table.getTableid()}==${tableid}" th:text="${table.getTableid()}" style="background-color:rgb(231,240,79);;float:left;border-radius:10px;text-align:center;padding:20px 20px 10px 20px;margin:10px 10px 10px 10px;font-size:25px;font-weight:bolder;height:25%;width:15%">
+</button>
+</div>
+</body>
+<script type="text/javascript">
+    function cannotselect() {
+        alert("该桌已有客人入座")
+    }
+    function canselect(obj) {
+        $(".can").css("background-color", "rgb(113,181,190)")
+        $(obj).css("background-color", "rgb(231,240,79)")
+        var id=$(obj).text()
+        parent.document.getElementById("tablenum").value=id
+    }
+</script>
+</html>

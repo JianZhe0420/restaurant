@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>subordersaleadminFrame</title>
+</head>
+<body>
+共计卖出：[[${num}]]份
+<br>
+<hr>
+<br>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>菜品名称</th><th>状态</th><th>当时单价</th><th>下单时间</th></tr>
+    <tr th:each="suborder,so:${suborderlist}"><td th:text="${so.count}"></td><td th:text="${suborder.getSuborderdish()}"></td><td th:text="${suborder.getSuborderstatus()}"></td><td th:text="${suborder.getSubordermoney()}"></td><td th:text="${suborder.getSubordertimestring()}"></td></tr>
+</table>
+</body>
+</html>

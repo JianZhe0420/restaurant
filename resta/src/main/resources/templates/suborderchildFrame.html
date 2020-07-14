@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>小订单</title>
+    <style>
+        body {
+            background-color: rgb(169, 214, 246);
+        }
+    </style>
+    <script src="jquery.min.js"></script>
+</head>
+<body onload="进行每秒操作()">
+<div th:each="suborder:${suborderlist}" th:name="${suborder.getSuborderid()}" th:attr="orderid=${suborder.getOrderid()}" style="border-radius:10px;word-wrap:break-word;margin: 10px 5px 10px 5px;background-color: #497897;height: 100px;width: 40%;float: left">
+    <table>
+        <tr>
+            <th th:text="${suborder.getOrderid()}" style="width: 40%"></th><th><div name="下单时间" th:data-time="${suborder.getSubordertime()}">0</div></th>
+        </tr>
+        <tr>
+            <td th:text="${suborder.getSuborderid()}" style="width: 40%"></td><td><div th:text="${suborder.getSuborderdish()}"></div></td>
+        </tr>
+        <tr>
+            <td style="width: 40%;background-color: #dcf3f5" th:text="${suborder.getSubordertype()}"></td><td><button onclick="完成(this)" th:class="${suborder.getOrderid()}" th:name="${suborder.getSuborderid()}" th:attr="num=${suborder.getOrdercount()},orderid=${suborder.getOrderid()}" style="float: right;font-size: 5px;height: 15px;width: 20px">完</button><br><button onclick="出错(this)" th:class="${suborder.getOrderid()}" th:name="${suborder.getSuborderid()}" th:attr="num=${suborder.getOrdercount()},orderid=${suborder.getOrderid()}" style="float: right;font-size: 1px;height: 15px;width: 20px;background-color: red">错</button></td>
+        </tr>
+    </table>
+
+</div>
+
+</body>
+<script th:inline="javascript">
+    // 定义format
+    Date.prototype.format = function(fmt) {
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+    
+    /*$(".下单时间").setInterval("gettimego($(this).attr(\"data-time\"),this)",1*1000)*/
+    function 进行每秒操作() {
+        setInterval("修改订单已过时间()",1*1000);
+    }
+    function 修改订单已过时间(){
+        document.getElementsByName("下单时间").forEach(function (item){
+            var nowtime=new Date();
+            var time1=new Date(item.getAttribute("data-time"))
+            item.innerHTML = new Date(nowtime.getTime() -  time1.getTime()).format("hh:mm:ss");
+        })
+    }
+    
+    function 完成(obj) {
+        var num=obj.getAttribute("num")
+        if (obj.getAttribute("num")==1){
+        //    如果对应大订单中只剩一个小订单
+            var 对应大订单id=obj.getAttribute("orderid")
+            var nownoworderid=对应大订单id
+            var 对应大订单标签=parent.document.getElementsByName(对应大订单id)[0]
+            /*$("table[name=对应大订单id]").each(function (item){
+                alert("aaaa"+item.innerHTML)
+
+            })*/
+                $(对应大订单标签).remove()
+            $.ajax({
+                url: "okorderajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: nownoworderid,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    删除子订单数据库(obj);
+                    parent.location.href = ""
+                    parent.location.href = "http://localhost:8080/re/chefhome"
+                },
+                error() {
+                }
+            })
+
+        }else {
+            var 对应大订单id=obj.getAttribute("orderid")
+            //    如果对应大订单中还有其他小定单
+            //     document.getElementsByClassName(对应大订单id)[1].setAttribute("num",(obj.getAttribute("num")*1-1*1))
+            // document.getElementsByClassName(对应大订单id)[2].setAttribute("num",(obj.getAttribute("num")*1-1*1))
+            var div1=document.getElementsByClassName(对应大订单id)
+            for (var i = 1; i<div1.length;i++) {
+                div1[i].setAttribute("num",(num*1-1*1));
+            };
+            // var 对应大订单id=obj.getAttribute("orderid")
+            var 小定单id=obj.getAttribute("name")
+            // alert(parent.document.getElementById("orderchildFrame").ownerDocument.getElementsByName(小定单id))
+            parent.document.getElementById(小定单id).style.color="red"
+            删除子订单数据库(obj)
+        }
+
+    }
+
+    function 删除子订单数据库(obj) {
+        var 小定单id=obj.getAttribute("name")
+        var nownowsuborderid=小定单id
+        var 这个标签=document.getElementsByName(小定单id)
+        这个标签.forEach(function (item) {
+            item.parentNode.removeChild(item)
+        })
+        $.ajax({
+            url: "oksuborderajax",
+            contentType: "applicaton/text;charset=UTF-8",
+            data: nownowsuborderid,
+            dataType: "text",
+            type: "post",
+            success: function (data) {
+            },
+            error() {
+            }
+        })
+    }
+    function 出错(obj) {
+        var num=obj.getAttribute("num")
+        if (obj.getAttribute("num")==1){
+            //    如果对应大订单中只剩一个小订单
+            var 对应大订单id=obj.getAttribute("orderid")
+            var nownoworderid=对应大订单id
+            var 对应大订单标签=parent.document.getElementsByName(对应大订单id)[0]
+            $(对应大订单标签).remove()
+            $.ajax({
+                url: "noorderajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: nownoworderid,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    parent.location.href = ""
+                    parent.location.href = "http://localhost:8080/re/chefhome"
+                },
+                error() {
+                }
+            })
+
+        }else {
+            var 对应大订单id=obj.getAttribute("orderid")
+            var div1=document.getElementsByClassName(对应大订单id)
+            for (var i = 1; i<div1.length;i++) {
+                div1[i].setAttribute("num",(num*1-1*1));
+            };
+            // var 对应大订单id=obj.getAttribute("orderid")
+            var 小定单id=obj.getAttribute("name")
+            // alert(parent.document.getElementById("orderchildFrame").ownerDocument.getElementsByName(小定单id))
+            parent.document.getElementById(小定单id).style.color="red"
+        }
+        var 小定单id=obj.getAttribute("name")
+        var nownowsuborderid=小定单id
+        var 这个标签=document.getElementsByName(小定单id)
+        这个标签.forEach(function (item) {
+            item.parentNode.removeChild(item)
+        })
+        $.ajax({
+            url: "nosuborderajax",
+            contentType: "applicaton/text;charset=UTF-8",
+            data: nownowsuborderid,
+            dataType: "text",
+            type: "post",
+            success: function (data) {
+            },
+            error() {
+            }
+        })
+    }
+</script>
+</html>

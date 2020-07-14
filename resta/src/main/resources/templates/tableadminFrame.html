@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>tableadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body style="text-align:center">
+<table border="1" cellspacing="0">
+    <tr><th>桌号</th><th>状态</th><th>改动</th></tr>
+    <tr th:each="table1:${tabkelist}" th:id="${table1.getTableid()}" th:if="${table1.getTablemsg()}==1"><td th:text="${table1.getTableid()}"></td><td>空闲</td><td><button onclick="删除(this)" th:attr="tableid=${table1.getTableid()}" style="color: red">删除</button></td></tr>
+    <tr th:each="table1:${tabkelist}" th:id="${table1.getTableid()}" th:if="${table1.getTablemsg()}==2"><td th:text="${table1.getTableid()}"></td><td>忙碌</td><td><button onclick="删除(this)" th:attr="tableid=${table1.getTableid()}" style="color: red">删除</button></td></tr>
+    </table>
+<br>
+<button onclick="新增()">新增</button>
+</body>
+<script th:inline="javascript">
+    function 删除(obj) {
+        var tid=obj.getAttribute("tableid")
+        $(document.getElementById(tid)).remove()
+        $.ajax({
+            url: "deltableadminajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: tid,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.document.getElementById("adminFrame").src="";
+                parent.document.getElementById("adminFrame").src="tableadminFrame";
+            },
+            error() {
+            }
+        })
+    }
+    function 新增() {
+        alert("123")
+        var tablemsg=" "
+        $.ajax({
+            url: "addtableadminajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: tablemsg,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.document.getElementById("adminFrame").src="";
+                parent.document.getElementById("adminFrame").src="tableadminFrame";
+            },
+            error() {
+            }
+        })
+    }
+</script>
+</html>

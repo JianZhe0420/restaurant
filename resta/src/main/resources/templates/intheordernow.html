@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>intheordernow</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<div th:each="order1,o1:${orderlist}" style="border-radius:10px;word-wrap:break-word;overflow:auto;margin: 10px 20px 10px 20px;background-color: #8fcaee;width: 20%;float: left">
+
+        <table th:name="${order1.getOrderid()}" th:class="${order1.getOrderid()}">
+        <tr style="height: 20%">
+            <th><div th:text="${order1.getOrderid()}" ></div></th>
+            <th style="width: 60%;background-color: #D5B474" th:text="${order1.getOrdertype()}"></th>
+            <th style="width: 20%;background-color: #8F8695;font-weight: bolder"><div th:if="${order1.getOrdertype()}=='外卖'"><button onclick="外卖地址按钮(this)" th:attr="addr=${order1.getOrderaddress()}" style="width: 100%">地址</button></div><div th:if="${order1.getOrdertype()}=='堂食'"><div th:text="${order1.getOrdertablenum()}"></div>桌</div></th></tr>
+        <tr th:each="allsuborder:${suborderlist}" th:if="${allsuborder.getOrderid()}==${order1.getOrderid()}" style="height: 80%">
+            <td></td>
+            <td><div th:name="${order1.getOrderid()}" th:id="${allsuborder.getSuborderid()}" th:text="${allsuborder.getSuborderdish()}" th:if="${allsuborder.getSuborderstatus()}=='完成'" style="color:#038B8D;font-weight: bolder"></div><div th:name="${order1.getOrderid()}" th:id="${allsuborder.getSuborderid()}" th:text="${allsuborder.getSuborderdish()}" th:if="${allsuborder.getSuborderstatus()}=='未完成'"></div><div th:name="${order1.getOrderid()}" th:id="${allsuborder.getSuborderid()}" th:text="${allsuborder.getSuborderdish()}" th:if="${allsuborder.getSuborderstatus()}=='出错'" style="color: red;font-weight: bolder"></div></td>
+            <td><button th:if="${allsuborder.getSuborderstatus()}=='完成'" th:class="${allsuborder.getOrderid()}" class="小订单" onclick="确认完成(this)" th:name="${allsuborder.getSuborderid()}" style="float: right;font-size: 1px;height: 15px;width: 20px">完</button><button th:if="${allsuborder.getSuborderstatus()}=='出错'" class="小订单" onclick="确认出错(this)" th:name="${allsuborder.getSuborderid()}" style="float: right;font-size: 1px;height: 15px;width: 20px">完</button><button th:if="${allsuborder.getSuborderstatus()}=='未完成'" th:class="${allsuborder.getOrderid()}" class="小订单" onclick="确认完成(this)" th:name="${allsuborder.getSuborderid()}" style="float: right;font-size: 1px;height: 15px;width: 20px;display: none">完</button></td></tr>
+            <tr style="height: 80%">
+                <td></td>
+                <td></td>
+                <td><button onclick="大订单确认完成(this)" th:name="${order1.getOrderid()}" style="float: right;font-size: 1px;height: 15px;width: 40px">完成</button></td></tr>
+    </table>
+</div>
+</body>
+<script th:inline="javascript">
+    function 确认完成(obj) {
+        var vvvv=obj.getAttribute("name")
+        $.ajax({
+            url: "suborderisokcash",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: vvvv,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.document.getElementById("childFrame").src="";
+                parent.document.getElementById("childFrame").src="intheordernow";
+            },
+            error() {
+            }
+        })
+    }
+    function 外卖地址按钮(obj) {
+        alert(obj.getAttribute("addr"))
+
+    }
+    function 确认出错(obj) {
+        var vvvv=obj.getAttribute("name")
+        $.ajax({
+            url: "suborderisnocash",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: vvvv,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.document.getElementById("childFrame").src="";
+                parent.document.getElementById("childFrame").src="intheordernow";
+            },
+            error() {
+            }
+        })
+    }
+    // function 确认出错(obj) {
+    //     var vvvv=obj.getAttribute("name")
+    //     $.ajax({
+    //         url: "suborderisnocash",
+    //         contentType: "applicaton/json;charset=UTF-8",
+    //         data: vvvv,
+    //         dataType: "text",
+    //         type: "post",
+    //         cache: false,
+    //         success: function (data) {
+    //             parent.document.getElementById("childFrame").src="";
+    //             parent.document.getElementById("childFrame").src="intheordernow";
+    //         },
+    //         error() {
+    //         }
+    //     })
+    // }
+    function 大订单确认完成(obj) {
+        var aaa=obj.getAttribute("name")
+        if (document.getElementsByClassName(aaa).length==1){
+            var vvvv=obj.getAttribute("name")
+            $.ajax({
+                url: "orderisokcash",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: vvvv,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    parent.document.getElementById("childFrame").src="";
+                    parent.document.getElementById("childFrame").src="intheordernow";
+                },
+                error() {
+                }
+            })
+        }
+        else {
+            alert("订单中还有菜品未确认，请确认")
+        }
+    }
+</script>
+</html>

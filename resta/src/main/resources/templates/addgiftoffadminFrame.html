@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>addgiftoffadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<!--赠品-->
+<form id="form" name="form" action="" method="post" th:action="@{/addgift}">
+    <div id="loginBox">
+        赠&nbsp;&nbsp;品&nbsp;&nbsp;名&nbsp;&nbsp;称：<input type="text" name="offname" id="offname" size="20" required="required">
+        <br>
+        获得赠品所需金额：<input type="text" name="offmax" id="offmax" size="25" required="required">
+        <br>
+        <select id="offstatus" name="offstatus" style="float:left">
+            <option selected="selected" value="1">启用</option>
+            <option value="0">不启用</option>
+        </select>
+        <br>
+        <input type = "submit" id="submit" value="提交">
+    </div>
+</form>
+</body>
+<script type="text/javascript">
+    $("#offname").blur(function () {
+        var offname=document.getElementById("offname").value
+        if(offname=="会员"){
+            alert("此折扣名称不可用！")
+            document.getElementById("offname").value=""
+        }
+
+    })
+</script>
+</html>

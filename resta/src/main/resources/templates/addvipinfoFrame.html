@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>addvipinfoFram</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<form id="form" name="form" action="" method="post" th:action="@{/addvipinfo}">
+    <input id="userid" name="userid" th:value="${userid}" style="display: none">
+            <input type="text" name="vipname" id="vipname" placeholder="会员姓名：" size="20" required="required">
+            <br></br>
+            <input type="number" name="viptel" id="viptel" placeholder="电话：" size="12" required="required">
+            <br></br>
+    <div>单价：<div th:text="${vipp}+'￥'"></div></div>
+    <select id="moneytype" name="moneytype" style="height:15%;width:7%;float:left;">
+        <option selected="selected" value="现金">现金</option>
+        <option value="支付宝">支付宝</option>
+        <option value="微信">微信</option>
+    </select>
+    <br>
+            <input type = "submit" id="submit" value="添加">
+</form>
+</body>
+<script type="text/javascript">
+    $("#viptel").blur(function () {
+        var viptel=document.getElementById("viptel").value
+        if(viptel!=""){
+            $.ajax({
+                url: "viptelajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: viptel,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    // System.out.println("成功");
+                    if (data == "in") {
+                        alert("此号码已存在！")
+                        document.getElementById("viptel").value=""
+                    }
+                    else {
+                    }
+                },
+                error() {
+                }
+            })
+        }
+
+    })
+</script>
+</html>

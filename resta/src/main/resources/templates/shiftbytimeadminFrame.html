@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>shiftbytimeadminFrame</title>
+</head>
+<body>
+根据时间查询出勤：
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>姓名</th><th>登录时间</th></tr>
+    <tr th:each="shift,s1:${shiftlist}"><td th:text="${s1.count}"></td><td><div th:each="user:${userlist}"><div th:if="${user.getUserid()}==${shift.getShiftuser()}" th:text="${user.getUsername()}"></div></div></td><td th:text="${shift.getShifttimebeginstring()}"></td></td></tr>
+</table>
+</body>
+</html>

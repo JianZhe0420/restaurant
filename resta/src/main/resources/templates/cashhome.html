@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>点餐</title>
+    <script src="jquery.min.js"></script>
+  <style>
+
+        .blue{
+            border:1px solid #1e7db9;
+            box-shadow: 0 1px 2px #8fcaee inset,0 -1px 0 #497897 inset,0 -2px 3px #8fcaee inset;
+            background: -webkit-linear-gradient(top,#42a4e0,#2e88c0);
+            background: -moz-linear-gradient(top,#42a4e0,#2e88c0);
+            background: linear-gradient(top,#42a4e0,#2e88c0);
+        }
+        body{
+            width: 99%;
+            height: 97%;
+            background-color: #413bcc;
+        }
+        html{
+            width: 100%;
+            height: 100%;
+        }
+        #header {
+            background-color: #3000cc;
+            color:white;
+            height:10%;
+        }
+        #cart {
+            line-height:30px;
+            background-color: rgb(169, 214, 246);
+            height:100%;
+            width:25%;
+            float:left;
+
+        }
+        #option {
+            background-color: rgb(115, 189, 204);
+            height:100%;
+            width:5%;
+            float:left;
+
+
+        }
+
+        #section {
+            width:70%;
+            float:left;
+            background-color: rgb(80, 91, 204);
+            height:100%;
+
+        }
+      .notin{
+          color: red;
+      }
+      .isin{
+            color: red;
+          display: none
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<div id="cart" th:fragment="cart">
+    <div id="cart1" style="background-color:rgb(80,91,204);">
+        <table style="width:100%;" border="0px">
+            <tr>
+                <th>合计：</th><td id="合计">0</td>
+                <th style="font-size: 10px">折扣：<div id="最终折扣类型存放处"></div></th><td>
+
+            </td>
+                <th>类型：</th><td id="类型">堂食</td>
+            </tr>
+
+        </table>
+    </div>
+    <div id="messageDiv">
+        <input type ="text"  id = "vipmessage" value="" placeholder="输入会员电话：" style="height:8%;width:70%;float:left;"/>
+        <div style="color: brown;float: left;width: 15%;font-weight: bolder;">桌号：</div>
+        <input id ="tablenum" onclick="selecttablenum(this)" type="button" th:unless="${canusetable.getTableid()}==0" th:value="${canusetable.getTableid()}" style="font-weight:bolder;width:10%;height:8%;background-color:rgb(80,91,204);color: #ccc900;float:left;">
+        <input id ="tablenum" onclick="selecttablenum(this)" type="button" th:if="${canusetable.getTableid()}==0" th:value="无" style="font-weight:bolder;width:10%;height:8%;background-color:rgb(80,91,204);color: #ccc900;float:left;">
+        <br>
+        <div id="notinmsg" class="isin">会员不存在</div>
+    </div>
+    <div id="cartItem" style="background-color:rgb(106,90,204);">
+
+        <table id="dishcar" style="width:100%;" border="0px" >
+            <tbody id="tableItemList">
+            <tr>
+                <th>名称</th><th>单价</th><th>数量</th>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <div id="cart3" style="background-color:rgb(169,214,246);">
+
+    </div>
+
+</div>
+
+<div id="option" th:fragment="option">
+    <input id ="searchInfo" type="text" required="required" placeholder="搜索" style="width:99%;height:5%;background-color: #a9d6f6">
+    <button type="button" style="width:99%;height:5%;border-radius:10px;background-color: rgb(115,189,204)" onclick="searchDish()">
+        搜索
+    </button>
+    <button type="button" style="width:99%;border-radius:10px;height:6%;background-color: rgb(169,214,246);font-size: 5px" onclick="checkOffas()">
+        得到可用折扣
+    </button>
+    <div id="折扣计算处">
+
+    </div>
+    <p style="width:99%;height:1%">
+        折后：
+    <div id="折后合计" class='需清除折扣组' style="width:99%;height:3%">
+
+    </div>
+
+    </p>
+    <input type="button" value="提交" onclick="订单提交()" style="height:9%;width:99%;border-radius:10px;float:left;margin-right: 1%;margin-left: 1%;background-color:  rgb(204,201,0);font-size: 30px">
+
+    <button type="button" style="width:99%;border-radius:10px;height:7%;background-color: rgb(115,189,204);font-size: 30px" onclick="addItem()">
+        +
+    </button>
+    <button type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204);font-size: 30px" onclick="subItem()">
+        -
+    </button>
+    <button type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="changeNumber()">
+        数量
+    </button>
+    <button type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="removeItem()">
+        删除
+    </button>
+    <button id="刷新菜品按钮" type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="刷新菜品()">
+        刷新菜品
+    </button>
+    <button id="查看订单按钮" type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="查看已完成订单()">
+        查看订单
+    </button>
+    <button type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="carclean()">
+        清空购物车
+    </button>
+    <button type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="addvip()">
+        添加会员
+    </button>
+    <button type="button" style="width:99%;height:7%;border-radius:10px;background-color: rgb(115,189,204)" onclick="changetablenum()">
+        更改桌号状态
+    </button>
+
+    <p style="width:99%;height:8%">
+
+    </p>
+
+</div>
+<div id="section">
+    <div th:fragment="dishtype">
+        <div id="dishtype" style="overflow:auto;background-color:rgb(80,91,204);height:10%;">
+            <div id="菜品分类" style="font-weight:bolder;background-color:rgb(65,59,204);text-align:center;height:30px;line-height:30px;float:left;height:100%;width:5%">
+                分<br>类
+            </div>
+            <button id="all" type="button" class="blue" style="font-size:15px;font-weight:bolder;width:80px;border-radius:10px;float:left;padding:10px;margin:20px 0px 3px 20px;">全&nbsp;&nbsp;部</button>
+
+            <button id="other" th:attr="tid=${type.getDishtypeid()}" type="button" th:text="${type.getDishtypename()}" th:each="type:${typelist}" class="button blue" style="font-size:15px;font-weight:bolder;width:80px;border-radius:10px;float:left;padding:10px;margin:20px 0px 3px 20px;"></button>
+            <input  id="ceshi" type="hidden" value="aaa">
+        </div>
+    </div>
+    <div id="nowtype" style="background-color:rgb(65,59,204);height:25px;line-height:25px;width:10%;color: #ccc900;font-weight: bolder;text-align: center">
+        全&nbsp;&nbsp;部
+    </div>
+    <div id="dish" style="background-color:#a9d6f6;height:62%;">
+        <iframe id="childFrame" name="childFrame" style="height:100%;width:100%;" src="selectAllDish" >
+        </iframe>
+
+
+    </div>
+    <div id="section3" th:fragment="section3" style="background-color:rgb(80,91,204);height:23%;padding: 0.2%">
+        <div style="height:100%;width:20%;float:left;margin: 15px">
+            <input type="number" maxlength="7" size="7" required="required" value="0.00" min="0" step="0.01" id="moneyInput" placeholder="实收金额" style="width:100%;height:33%;font-size: 30px">
+            <div id="change" style="font-size: 30px">
+                找零：
+            </div>
+
+            <input type="button" onclick="计算找零()" style="height:32%;width:100%;border-radius:10px;font-size: 20px;background-color: #73bdcc" value="计算找零">
+
+        </div>
+
+        <!--        <input type="button" value="提交" style="height:100%;width:7%;float:left;margin-right: 1%;margin-left: 1%;background-color:  rgb(3,139,141);font-size: 30px">-->
+
+        <select id="支付方式" name="啊啊啊啊啊啊" style="height:15%;width:7%;margin: 15px">
+           <option selected="selected" value="现金">现金</option>
+            <option value="支付宝">支付宝</option>
+            <option value="微信">微信</option>
+        </select>
+        <select id="订单类型" style="height:15%;width:7%;margin: 15px" onchange="订单类型(this.value)">
+            <option selected="selected" value="堂食">堂食</option>
+            <option value="打包">打包</option>
+            <option value="外卖">外卖</option>
+        </select>
+
+        <br>
+        <br>
+        <div id="外卖地址框" name="外卖地址" style="float: left;display: none">
+            外卖地址：
+            <br>
+            <input id="外卖地址" type="text" style="width: 300px;">
+        </div>
+        <a href="" th:href="@{/cashback}"  style="width:5%;height:30%;background-color:#ccc900;float: right;text-align:center;text-decoration:none">
+            <p style="width: 100%;height: 100%;">
+                退出
+            </p>
+        </a>
+    </div>
+
+</div>
+
+<input th:id="${off.getOffid()}" name="折扣信息" th:each="off:${offList1}" th:attr="offid=${off.getOffid()},offname=${off.getOffname()},offtype=${off.getOffType()},offmax=${off.getOffmax()},offsub=${off.getOofsub()},offrate=${off.getOffrate()}" style="display: none">
+</body>
+<input th:id="${vipoff.getOffid()}" class="会员折扣信息" th:attr="vipffid=${vipoff.getOffid()},vipoffname=${vipoff.getOffname()},vipofftype=${vipoff.getOffType()},vipoffmax=${vipoff.getOffmax()},vipoffsub=${vipoff.getOofsub()},vipoffrate=${vipoff.getOffrate()}" style="display: none">
+<form id="ordersubmit" th:action="@{/orderonsubmit}">
+<div id="订单提交区">
+    <div id="大订单区">
+        <input id="大订单金额" name="orderprice" value="0" style="display: none">
+        <input id="大订单食用方式" name="ordertype" value="堂食" style="display: none">
+        <input id="大订单外卖地址" name="orderaddress" value="" style="display: none">
+        <input id="大订下单员工" name="orderuser" th:value="${userid}" style="display: none">
+        <input id="大订单折扣" name="orderoffname" value="" style="display: none">
+        <input id="大订单付款方式" name="ordermoneytype" value="现金" style="display: none">
+        <input id="大订对应桌号" name="ordertable" value="" style="display: none">
+    </div>
+    <div id="小订单区">
+
+    </div>
+</div>
+</form>
+<script th:inline="javascript">
+    // 定义format
+    Date.prototype.format = function(fmt) {
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+
+    setInterval("检测后厨步伐()",5*1000);
+    function 检测后厨步伐() {
+        var xxxx="1"
+        $.ajax({
+            url: "cheakchefstepajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: xxxx,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                if (data=="成功"){
+                    document.getElementById("查看订单按钮").style.color="red"
+                }
+            },
+            error() {
+            }
+        })
+    }
+    setInterval("检测管理步伐()",5*1000);
+    function 检测管理步伐() {
+        var xxxx="1"
+        $.ajax({
+            url: "cheakadminstepajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: xxxx,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                if (data=="成功"){
+                    document.getElementById("刷新菜品按钮").style.color="red"
+                }
+            },
+            error() {
+            }
+        })
+    }
+    function 刷新菜品() {
+        // 清除折扣计算生成产物()
+        // carclean()
+        // document.getElementById("外卖地址框").value=""
+        // document.getElementById("外卖地址框").style.display="none"
+        location.reload(true)
+    }
+    function 订单类型(value) {
+        document.getElementById("类型").innerHTML=value
+        if (value=="外卖"){
+            document.getElementById("外卖地址框").style.display=""
+        }
+        else {
+            document.getElementById("外卖地址框").value=""
+            document.getElementById("外卖地址框").style.display="none"
+        }
+    }
+    function 订单提交() {
+        var xxxx="1"
+        $.ajax({
+            url: "cheakadminstepajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: xxxx,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                if (data=="成功"){
+                    document.getElementById("刷新菜品按钮").style.color="red"
+                    alert("相关信息已发生改变，请刷新页面后再提交订单！")
+                }
+                else {
+                    if (document.getElementsByClassName("dishcarlist").length!=0&&document.getElementById("tablenum").value!="无"){
+                        document.querySelectorAll(".dishcarlist").forEach(function (item) {
+                            var carlistdishnum=item.childNodes[0].childNodes[2].innerHTML
+                            for(i = 0; i < carlistdishnum; ++i){
+                                document.getElementById("小订单区").innerHTML=document.getElementById("小订单区").innerHTML+"<input name='suborderdish' value='"+item.childNodes[0].childNodes[0].innerHTML+"' style='display: none'>\n" +
+                                    "        <input name='subordermoney' value='"+item.childNodes[0].childNodes[1].innerHTML+"' style='display: none'>"
+                            }
+                        })
+                        if (document.body.contains(document.getElementById("折后计算安放处"))){
+                            document.getElementById("大订单金额").setAttribute("value",document.getElementById("折后计算安放处").innerHTML)
+                            document.getElementById("大订单折扣").setAttribute("value",document.getElementById("用到的折扣信息").innerHTML)
+                        }
+                        else {
+                            document.getElementById("大订单金额").setAttribute("value",document.getElementById("合计").innerHTML)
+                        }
+                        if (document.getElementById("订单类型").value=="外卖"){
+                            if (document.getElementById("外卖地址").value==""||document.getElementById("外卖地址").value==" "){
+                                alert("请输入外卖地址")
+                            }
+                            else {
+                                document.getElementById("大订单食用方式").setAttribute("value",document.getElementById("订单类型").value)
+                                document.getElementById("大订单外卖地址").setAttribute("value",document.getElementById("外卖地址").value)
+                                document.getElementById("大订单付款方式").setAttribute("value",document.getElementById("支付方式").value)
+                                document.getElementById("大订对应桌号").setAttribute("value",document.getElementById("tablenum").value)
+                                var form=document.getElementById("ordersubmit").submit()
+                            }
+                        }
+                        else {
+                            document.getElementById("大订单食用方式").setAttribute("value",document.getElementById("订单类型").value)
+                            document.getElementById("大订单外卖地址").setAttribute("value",document.getElementById("外卖地址").value)
+                            document.getElementById("大订单付款方式").setAttribute("value",document.getElementById("支付方式").value)
+                            document.getElementById("大订对应桌号").setAttribute("value",document.getElementById("tablenum").value)
+                            alert("提交成功！")
+                            var form=document.getElementById("ordersubmit").submit()
+                        }
+                    }
+                    else if (document.getElementsByClassName("dishcarlist").length!=0&&document.getElementById("tablenum").value=="无"&&document.getElementById("订单类型").value=="打包"){
+                        document.querySelectorAll(".dishcarlist").forEach(function (item) {
+                            var carlistdishnum=item.childNodes[0].childNodes[2].innerHTML
+                            for(i = 0; i < carlistdishnum; ++i){
+                                document.getElementById("小订单区").innerHTML=document.getElementById("小订单区").innerHTML+"<input name='suborderdish' value='"+item.childNodes[0].childNodes[0].innerHTML+"' style='display: none'>\n" +
+                                    "        <input name='subordermoney' value='"+item.childNodes[0].childNodes[1].innerHTML+"' style='display: none'>"
+                            }
+                        })
+                        if (document.body.contains(document.getElementById("折后计算安放处"))){
+                            document.getElementById("大订单金额").setAttribute("value",document.getElementById("折后计算安放处").innerHTML)
+                            document.getElementById("大订单折扣").setAttribute("value",document.getElementById("用到的折扣信息").innerHTML)
+                        }
+                        else {
+                            document.getElementById("大订单金额").setAttribute("value",document.getElementById("合计").innerHTML)
+                        }
+                        if (document.getElementById("订单类型").value=="外卖"){
+                            if (document.getElementById("外卖地址").value==""||document.getElementById("外卖地址").value==" "){
+                                alert("请输入外卖地址")
+                            }
+                            else {
+                                document.getElementById("大订单食用方式").setAttribute("value",document.getElementById("订单类型").value)
+                                document.getElementById("大订单外卖地址").setAttribute("value",document.getElementById("外卖地址").value)
+                                document.getElementById("大订单付款方式").setAttribute("value",document.getElementById("支付方式").value)
+                                document.getElementById("大订对应桌号").setAttribute("value",document.getElementById("tablenum").value)
+                                var form=document.getElementById("ordersubmit").submit()
+                            }
+                        }
+                        else {
+                            document.getElementById("大订单食用方式").setAttribute("value",document.getElementById("订单类型").value)
+                            document.getElementById("大订单外卖地址").setAttribute("value",document.getElementById("外卖地址").value)
+                            document.getElementById("大订单付款方式").setAttribute("value",document.getElementById("支付方式").value)
+                            document.getElementById("大订对应桌号").setAttribute("value",document.getElementById("tablenum").value)
+                            alert("提交成功！")
+                            var form=document.getElementById("ordersubmit").submit()
+                        }
+                    }
+                    else if (document.getElementsByClassName("dishcarlist").length!=0&&document.getElementById("tablenum").value=="无"&&document.getElementById("订单类型").value=="外卖"){
+                        document.querySelectorAll(".dishcarlist").forEach(function (item) {
+                            var carlistdishnum=item.childNodes[0].childNodes[2].innerHTML
+                            for(i = 0; i < carlistdishnum; ++i){
+                                document.getElementById("小订单区").innerHTML=document.getElementById("小订单区").innerHTML+"<input name='suborderdish' value='"+item.childNodes[0].childNodes[0].innerHTML+"' style='display: none'>\n" +
+                                    "        <input name='subordermoney' value='"+item.childNodes[0].childNodes[1].innerHTML+"' style='display: none'>"
+                            }
+                        })
+                        if (document.body.contains(document.getElementById("折后计算安放处"))){
+                            document.getElementById("大订单金额").setAttribute("value",document.getElementById("折后计算安放处").innerHTML)
+                            document.getElementById("大订单折扣").setAttribute("value",document.getElementById("用到的折扣信息").innerHTML)
+                        }
+                        else {
+                            document.getElementById("大订单金额").setAttribute("value",document.getElementById("合计").innerHTML)
+                        }
+                        if (document.getElementById("订单类型").value=="外卖"){
+                            if (document.getElementById("外卖地址").value==""||document.getElementById("外卖地址").value==" "){
+                                alert("请输入外卖地址")
+                            }
+                            else {
+                                document.getElementById("大订单食用方式").setAttribute("value",document.getElementById("订单类型").value)
+                                document.getElementById("大订单外卖地址").setAttribute("value",document.getElementById("外卖地址").value)
+                                document.getElementById("大订单付款方式").setAttribute("value",document.getElementById("支付方式").value)
+                                document.getElementById("大订对应桌号").setAttribute("value",document.getElementById("tablenum").value)
+                                var form=document.getElementById("ordersubmit").submit()
+                            }
+                        }
+                        else {
+                            document.getElementById("大订单食用方式").setAttribute("value",document.getElementById("订单类型").value)
+                            document.getElementById("大订单外卖地址").setAttribute("value",document.getElementById("外卖地址").value)
+                            document.getElementById("大订单付款方式").setAttribute("value",document.getElementById("支付方式").value)
+                            document.getElementById("大订对应桌号").setAttribute("value",document.getElementById("tablenum").value)
+                            alert("提交成功！")
+                            var form=document.getElementById("ordersubmit").submit()
+                        }
+                    }
+                    else if(document.getElementsByClassName("dishcarlist").length!=0&&document.getElementById("tablenum").value=="无"){
+                        alert("已客满，请清桌！")
+                    }
+                    else {
+                        alert("订单为空！")
+                    }
+                }
+            },
+            error() {
+            }
+        })
+
+    }
+    function checkOffas() {
+        清除折扣计算生成产物()
+        var nownowmoney=document.getElementById("合计").innerHTML
+        var nowalloffinfo=document.getElementsByName("折扣信息")
+        nowalloffinfo.forEach(function (item) {
+            if (Number(nownowmoney*100)>=Number(item.getAttribute("offmax")*100)){
+                nowmoney=nownowmoney
+                nowmoney=((nownowmoney*100)*(item.getAttribute("offrate")*100)-(item.getAttribute("offsub")*10000))/10000
+                // alert(nowmoney)
+                var canoffname=item.getAttribute("offname")
+                var canofftype=item.getAttribute("offtype")
+                if(document.getElementById("折扣选择处")==null){
+                document.getElementById("折扣计算处").innerHTML="<div class='需清除折扣组'>"+"<select  id=\"折扣选择处\" style=\"height:3%;width:99%;float:left;\" onchange=\"折扣类型(this.value)\">\n" +
+                    "        <option id='' class='' data-type1='' selected=\"selected\" value='"+nowmoney+"'>无</option>\n" +
+                    "    </select>"+"</div>"
+                }
+                var canoffname=item.getAttribute("offname")
+                var canofftype=item.getAttribute("offtype")
+                nowmoney=nownowmoney
+                // alert((nowmoney*100)*(item.getAttribute("offrate")*100))
+                // alert((nowmoney*100)*(item.getAttribute("offrate")*100)-(item.getAttribute("offsub")*100*100))
+                //     alert(((nowmoney*100)*(item.getAttribute("offrate")*100)-(item.getAttribute("offsub")*100*100))/10000)
+                nowmoney=((nownowmoney*100)*(item.getAttribute("offrate")*100)-(item.getAttribute("offsub")*100*100))/10000
+                document.getElementById("折扣选择处").innerHTML=document.getElementById("折扣选择处").innerHTML+"<option id='"+nowmoney+"' class='"+canoffname+"' data-type1='"+canofftype+"' value='"+nowmoney+"'>"+canoffname+"</option>"
+            }
+            else {
+                nowmoney=nownowmoney
+                nowmoney=((nowmoney*100)*(item.getAttribute("offrate")*100)-(item.getAttribute("offsub")*100*100))/10000
+                // alert(nowmoney)
+                var canoffname=item.getAttribute("offname")
+                var canofftype=item.getAttribute("offtype")
+                if(document.getElementById("折扣选择处")==null){
+                    document.getElementById("折扣计算处").innerHTML="<div class='需清除折扣组'>"+"<select  id=\"折扣选择处\" style=\"height:3%;width:99%;float:left;\" onchange=\"折扣类型(this.value)\">\n" +
+                        "        <option id='' class='' data-type1='' selected=\"selected\" value='"+nowmoney+"'>无</option>\n" +
+                        "    </select>"+"</div>"
+                }
+            }
+        })
+    }
+    function 折扣类型(value){
+        if (document.getElementById("被添加的赠品")!=null){
+            document.getElementById("被添加的赠品").remove()
+        }
+        if (document.getElementById(value).getAttribute("data-type1")==0){
+            var dishoffname=document.getElementById(value).getAttribute("class")
+            document.getElementById("dishcar").innerHTML=document.getElementById("dishcar").innerHTML+"<tbody id='被添加的赠品' name='得到的赠品' class='dishcarlist' name='"+dishoffname+"'>"+"<tr>"+"<th>"+dishoffname+"</th><th id='88888'>0</th><th "+"id='"+dishoffname+"'>1</th>\n"+"</tr>"+"</tbody>";
+        }
+        document.getElementById("折后合计").innerHTML="<div id='折后计算安放处' class='需清除折扣组'>"+value+"</div>"
+        document.getElementById("最终折扣类型存放处").innerHTML="<div id='用到的折扣信息' class='需清除折扣组'>"+document.getElementById(value).getAttribute("class")+"</div>"
+    }
+    $(function () {
+        $("#vipmessage").blur(function () {
+            var vipnameortel=document.getElementById("vipmessage").value
+            if(vipnameortel==""){
+                清除折扣计算生成产物()
+            }
+            else {
+                $.ajax({
+                    url: "vipajax",
+                    contentType: "applicaton/json;charset=UTF-8",
+                    data: vipnameortel,
+                    dataType: "text",
+                    type: "post",
+                    cache: false,
+                    success: function (data) {
+                        // System.out.println("成功");
+                        if (data == "notin") {
+                            alert("会员不存在");
+                            $("#notinmsg").attr("class", "notin")
+                            清除折扣计算生成产物()
+                        } else {
+                            清除折扣计算生成产物()
+                            alert("应用会员折扣")
+                            $("#notinmsg").attr("class", "isin")
+                            document.getElementById("最终折扣类型存放处").innerHTML="<div class='需清除折扣组'>会员折扣</div>"
+                            var vipvalue=(((document.getElementById("合计").innerHTML*100)*$(".会员折扣信息").attr("vipoffrate")*100)-$(".会员折扣信息").attr("vipoffsub")*100*100)/10000
+                            document.getElementById("折后合计").innerHTML="<div id='折后计算安放处' class='需清除折扣组'>"+vipvalue+"</div>"
+                        }
+                    },
+                    error() {
+                        清除折扣计算生成产物()
+                    }
+                })
+            }
+        })
+
+
+
+        var list=new Array();
+
+        $("#all").click(function () {
+            document.getElementById("nowtype").innerHTML="全  部"
+            document.getElementById("childFrame").src="";
+            document.getElementById("childFrame").src="selectAllDish";
+
+        })
+
+        $("button#other").click(function () {
+                // var tid='"{"tid":'+'"'+i+'"'+'}"';
+                var tid=$(this).attr("tid");
+                var nowtype=$(this).html()
+                document.getElementById("childFrame").src="";
+                document.getElementById("childFrame").src="selectDishByType?id="+tid;
+                document.getElementById("nowtype").innerHTML=nowtype
+            });
+        });
+
+</script>
+<script type="text/javascript">
+    //判断自身选中
+
+    var nowid=null
+    var cardishid=null
+    var cardishstock=null
+    var nowthis=null
+    function addvip(){
+        document.getElementById("childFrame").src="";
+        document.getElementById("childFrame").src="addvip?userid="+[[${userid}]];
+        document.getElementById("nowtype").innerHTML="添加会员"
+    }
+    // 进行到这里
+    // function jsuanzhehou(obj) {
+    //     alert("进行计算")
+    //     document.getElementById("折后合计").innerHTML=obj.getAttribute("value")
+    // }
+    function 查看已完成订单() {
+        document.getElementById("查看订单按钮").style.color=""
+        document.getElementById("childFrame").src="";
+        document.getElementById("childFrame").src="intheordernow";
+        document.getElementById("nowtype").innerHTML="查看订单"
+    }
+    function changetablenum() {
+        document.getElementById("childFrame").src="";
+        document.getElementById("childFrame").src="changetablenum";
+        document.getElementById("nowtype").innerHTML="更改桌号状态"
+
+    }
+    function selecttablenum(obj) {
+        if (obj.value=="无"){
+            document.getElementById("childFrame").src="";
+            document.getElementById("childFrame").src="notablenuminfo";
+            document.getElementById("nowtype").innerHTML="选择桌号"
+        }
+        else {
+            var tablenum=document.getElementById("tablenum").value
+            document.getElementById("childFrame").src="";
+            document.getElementById("childFrame").src="tablenuminfo?tablenum="+tablenum;
+            document.getElementById("nowtype").innerHTML="选择桌号"
+        }
+
+    }
+    function searchDish(){
+        var search=document.getElementById("searchInfo").value
+        document.getElementById("childFrame").src="";
+        document.getElementById("childFrame").src="selectaSomeDish?search="+search;
+        document.getElementById("nowtype").innerHTML="搜  索"
+    }
+    function 计算找零(){
+        if (document.getElementById("折后计算安放处")==null){
+           if (Number(document.getElementById("moneyInput").value)<Number(document.getElementById("合计").innerHTML)){
+               alert("金额不足无法计算")
+           }
+           else {
+               document.getElementById("change").innerHTML="找零:"+(document.getElementById("moneyInput").value*100-document.getElementById("合计").innerHTML*100)/100+"￥"
+           }
+            }
+        else {
+            if (Number(document.getElementById("moneyInput").value)<Number(document.getElementById("折后计算安放处").innerHTML)){
+                alert(Number(document.getElementById("moneyInput").value))
+                alert(Number(document.getElementById("折后计算安放处").innerHTML))
+                alert("金额不足无法计算")
+            }
+            else {
+                document.getElementById("change").innerHTML="找零:"+(document.getElementById("moneyInput").value*100-document.getElementById("折后计算安放处").innerHTML*100)/100+"￥"
+            }
+        }
+    }
+    function nowin(stock,id,obj) {
+        if(nowid==null){
+            $(obj).css("background-color", "#ccc900");
+            nowid=id
+            cardishid=id
+            cardishstock=stock
+            nowthis=obj
+        }
+        else if (nowid==id){
+            $(obj).css("background-color", "rgb(106,90,204)");
+            nowid=null
+            cardishid=null
+            cardishstock=null
+            nowthis=null
+        }
+        else{
+            nowid=id
+            $(".dishcarlist").css("background-color", "rgb(106,90,204)");
+            $(obj).css("background-color", "rgb(229,252,96)");
+            cardishid=id
+            cardishstock=stock
+            nowthis=obj
+        }
+    }
+    function addItem() {
+        if(cardishid!=null){
+            if (cardishstock==document.getElementById(cardishid).innerHTML)
+            alert("库存不足")
+            else {
+                清除折扣计算生成产物()
+                document.getElementById("合计").innerHTML =(document.getElementById("合计").innerHTML*100+document.getElementById(cardishstock).innerHTML*100)/100
+                document.getElementById(cardishid).innerHTML=String(Number(document.getElementById(cardishid).innerHTML)+Number(1))
+            }
+        }
+        else {
+            alert("未选中菜品，请选择")
+        }
+    }
+    function subItem() {
+        if(cardishid!=null){
+            if (document.getElementById(cardishid).innerHTML==1) {
+                清除折扣计算生成产物()
+                document.getElementById("合计").innerHTML =(document.getElementById("合计").innerHTML*100-((document.getElementById(cardishstock).innerHTML*100)*((document.getElementById(cardishid).innerHTML)*100)/100))/100
+                $(document.getElementsByName(cardishid)).remove()
+                cardishid=null
+                nowid=null
+            }
+            else {
+                清除折扣计算生成产物()
+                document.getElementById("合计").innerHTML =(document.getElementById("合计").innerHTML*100-document.getElementById(cardishstock).innerHTML*100)/100
+                document.getElementById(cardishid).innerHTML=String(Number(document.getElementById(cardishid).innerHTML)-Number(1))
+            }
+        }
+        else {
+            alert("未选中菜品，请选择")
+        }
+    }
+    function removeItem() {
+        if(cardishid!=null){
+            清除折扣计算生成产物()
+            document.getElementById("合计").innerHTML =((document.getElementById("合计").innerHTML*100)-((document.getElementById(cardishstock).innerHTML*100)*(document.getElementById(cardishid).innerHTML*100)/100))/100
+        $(document.getElementsByName(cardishid)).remove()
+        cardishid=null
+            nowid=null
+        }
+        else{
+            alert("未选中菜品，请选择")
+        }
+    }
+    function changeNumber(){
+
+        if(cardishid!=null){
+            清除折扣计算生成产物()
+            dishNumber=Number(document.getElementById(cardishid).innerHTML)
+            var dishNumberNew=prompt("请输入数量，不能为空",dishNumber);
+            var rule = /^\d+$/
+            if(rule.test(dishNumberNew)) {
+                if (parseInt(dishNumberNew, 10) > cardishstock) {
+                    alert("库存不足")
+                    var dishNumberNew=prompt("请输入数量，不能为空",dishNumber);
+                } else if (dishNumberNew == 0) {
+                    removeItem()
+                } else {
+                    document.getElementById("合计").innerHTML =Number(document.getElementById("合计").innerHTML)+Number(document.getElementById(cardishstock).innerHTML)*(Number(dishNumberNew)-Number(document.getElementById(cardishid).innerHTML))
+                    document.getElementById(cardishid).innerHTML = dishNumberNew
+                    nowin(cardishstock,cardishid,nowthis)
+                }
+            }
+            else {
+                alert("输入内容不合法，必须为非负整数");
+                nowin(cardishstock,cardishid,nowthis)
+            }
+        }
+        else {
+            alert("未选中菜品，请选择")
+        }
+    }
+    function carclean() {
+        清除折扣计算生成产物()
+        $(".dishcarlist").empty()
+        $(".dishcarlist").remove()
+        nowid=null
+        cardishid=null
+        cardishstock=null
+        nowthis=null
+        document.getElementById("合计").innerHTML =0
+    }
+    function 清除折扣计算生成产物() {
+        if (document.getElementsByName("得到的赠品")!=null){
+            $(document.getElementsByName("得到的赠品")).remove()
+            document.getElementById("vipmessage").value=""
+        }
+        if (document.getElementById("被添加的赠品")!=null){
+            document.getElementById("被添加的赠品").remove()
+        }
+        $(".需清除折扣组").empty()
+    }
+</script>
+</html>

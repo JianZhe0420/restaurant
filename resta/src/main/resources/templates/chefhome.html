@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>后厨</title>
+    <script src="jquery.min.js"></script>
+    <style>
+        body{
+            width: 99%;
+            height: 97%;
+            background-color: #413bcc;
+        }
+        html{
+            width: 100%;
+            height: 100%;
+        }
+        #cart {
+            line-height:30px;
+            background-color: rgb(169, 214, 246);
+            height:100%;
+            width:25%;
+            float:left;
+
+        }
+        #option {
+            background-color: rgb(115, 189, 204);
+            height:100%;
+            width:5%;
+            float:left;
+        }
+
+        #section {
+            width:70%;
+            float:left;
+            background-color: rgb(169, 214, 246);
+            height:100%;
+        }
+    </style>
+
+</head>
+<body onload = "进行每秒操作()">
+
+<div id="cart" style="overflow:auto;margin: auto">
+    <iframe id="suborderchildFrame" name="suborderchildFrame" style="height:100%;width:100%;" src="suborderchildFrame" >
+    </iframe>
+</div>
+<div id="option" th:fragment="option">
+    <a href="" th:href="@{/cashback}"  style="width:80%;height:8%;margin: 10px;background-color:#ccc900;float: right;text-align:center;text-decoration:none">
+        <p style="width: 100%;height: 100%;">
+            退出
+        </p>
+        <hr>
+    </a>
+
+</div>
+
+<div id="section" style="overflow:auto;">
+
+    <div th:each="order1:${orderlist}" style="border-radius:10px;word-wrap:break-word;overflow:auto;margin: 10px 20px 10px 20px;background-color: #8fcaee;width: 20%;float: left">
+        <table th:name="${order1.getOrderid()}" th:class="${order1.getOrderid()}">
+            <tr style="height: 20%">
+                <th><div th:text="${order1.getOrderid()}" ></div></th>
+                <th style="width: 60%;background-color: #dcf3f5" th:text="${order1.getOrdertype()}"></th>
+                <th name="下单时间" th:data-time="${order1.getOrdertime()}" style="width: 20%">0</th></tr>
+            <tr style="height: 80%">
+                <td></td>
+                <td><div th:each="allsuborder:${suborderlist}" th:name="${order1.getOrderid()}" th:if="${allsuborder.getOrderid()}==${order1.getOrderid()}" th:id="${allsuborder.getSuborderid()}" th:text="${allsuborder.getSuborderdish()}"></div></td>
+                <td><button onclick="完成(this)" th:name="${order1.getOrderid()}" style="float: right;font-size: 1px;height: 15px;width: 20px">完</button></td></tr>
+        </table>
+    </div>
+
+</div>
+
+</body>
+
+<script th:inline="javascript">
+    // 定义format
+    Date.prototype.format = function(fmt) {
+        var o = {
+            "M+" : this.getMonth()+1,                 //月份
+            "d+" : this.getDate(),                    //日
+            "h+" : this.getHours(),                   //小时
+            "m+" : this.getMinutes(),                 //分
+            "s+" : this.getSeconds(),                 //秒
+            "q+" : Math.floor((this.getMonth()+3)/3), //季
+            "S"  : this.getMilliseconds()             //毫秒
+        };
+        if(/(y+)/.test(fmt)) {
+            fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+        }
+        for(var k in o) {
+            if(new RegExp("("+ k +")").test(fmt)){
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
+            }
+        }
+        return fmt;
+    }
+
+    setInterval("检测前台步伐()",10*1000);
+    /*$(".下单时间").setInterval("gettimego($(this).attr(\"data-time\"),this)",1*1000)*/
+    function 进行每秒操作() {
+        setInterval("修改订单已过时间()",1*1000);
+    }
+    function 检测前台步伐() {
+        var xxxx="1"
+        $.ajax({
+            url: "cheakcashstepajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: xxxx,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                if (data=="成功"){
+                    parent.location.href = ""
+                    parent.location.href = "http://localhost:8080/re/chefhome"
+                }
+
+            },
+            error() {
+            }
+        })
+    }
+
+    function 修改订单已过时间(){
+        document.getElementsByName("下单时间").forEach(function (item){
+            var nowtime=new Date();
+            var time1=new Date(item.getAttribute("data-time"))
+            item.innerHTML = new Date(nowtime.getTime() -  time1.getTime()).format("hh:mm:ss");
+        })
+    }
+    function 完成(obj) {
+        var nownoworderid=obj.getAttribute("name")
+        $.ajax({
+            url: "bigokorderajax",
+            contentType: "applicaton/json;charset=UTF-8",
+            data: nownoworderid,
+            dataType: "text",
+            type: "post",
+            cache: false,
+            success: function (data) {
+                parent.location.href = ""
+                parent.location.href = "http://localhost:8080/re/chefhome"
+            },
+            error() {
+            }
+        })
+    }
+    // function 出错(obj) {
+    //     var nownoworderid=obj.getAttribute("name")
+    //     $.ajax({
+    //         url: "bignoorderajax",
+    //         contentType: "applicaton/json;charset=UTF-8",
+    //         data: nownoworderid,
+    //         dataType: "text",
+    //         type: "post",
+    //         cache: false,
+    //         success: function (data) {
+    //             parent.location.href = ""
+    //             parent.location.href = "http://localhost:8080/re/chefhome"
+    //         },
+    //         error() {
+    //         }
+    //     })
+    // }
+</script>
+</html>

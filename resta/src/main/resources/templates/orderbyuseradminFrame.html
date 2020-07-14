@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>orderbyuseradminFrame</title>
+</head>
+<body>
+<br>
+订单合计：￥
+<br>
+<table border="1" cellspacing="0">
+    <tr><th></th><th>现金</th><th>微信</th><th>支付宝</th><th>合计</th></tr>
+    <tr><td>总计</td><td th:text="${Cxiannum}"></td><td th:text="${Cweinum}"></td><td th:text="${Czhinum}"></td><td th:text="${Cnum}"></td></tr>
+    <tr><td>退回</td><td th:text="${xiannum}"></td><td th:text="${weinum}"></td><td th:text="${zhinum}"></td><td th:text="${num}"></td></tr>
+    <tr><td>交易成功</td><td th:text="${subxiannum}"></td><td th:text="${subweinum}"></td><td th:text="${subzhinum}"></td><td th:text="${subnum}"></td></tr>
+</table>
+<br>
+<table border="1" cellspacing="0">
+    <tr><th>序号</th><th>状态</th><th>外卖地址</th><th>所用折扣</th><th>类型</th><th>付款方式</th><th>价格</th><th>下单时间</th></tr>
+    <tr th:each="order1,o1:${orderlist}"><td th:text="${o1.count}"></td><td th:text="${order1.getOrderstatus()}"></td><td th:text="${order1.getOrderaddress()}"></td><td th:text="${order1.getOrderoffname()}"></td><td th:text="${order1.getOrdertype()}"></td><td th:text="${order1.getOrdermoneytype()}"></td><td th:text="${order1.getOrderprice()}"></td><td th:text="${order1.getOrdertimestring()}"></td></tr>
+</table>
+</body>
+</html>

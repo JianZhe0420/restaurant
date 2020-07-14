@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>shiftbyusernameadminFrame</title>
+</head>
+<body>
+根据员工姓名查询出勤：
+<br>
+<table border="1" cellspacing="0">
+<tr><th>序号</th><th>登录时间</th></tr>
+<tr th:each="shift,s1:${shiftlist}"><td th:text="${s1.count}"></td><td th:text="${shift.getShifttimebeginstring()}"></td></td></tr>
+</table>
+</body>
+</html>

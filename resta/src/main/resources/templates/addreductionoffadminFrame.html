@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>addreductionoffadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<!--满减-->
+<form id="form" name="form" action="" method="post" th:action="@{/addreduction}">
+    <div id="loginBox">
+        折&nbsp;&nbsp;扣&nbsp;&nbsp;名&nbsp;&nbsp;称：<input type="text" name="offname" id="offname" size="20" required="required">
+        <br>
+        满&nbsp;&nbsp;：<input type="number" min="0" step="0.01" name="offmax" id="offmax" size="20" required="required">
+        <br>
+        减&nbsp;&nbsp;：<input type="number" min="0" step="0.01" name="offsub" id="offsub" size="20" required="required">
+        <br>
+        <select id="offstatus" name="offstatus" style="float:left">
+            <option selected="selected" value="1">启用</option>
+            <option value="0">不启用</option>
+        </select>
+        <br>
+        <input type = "submit" id="submit" value="提交">
+    </div>
+</form>
+</body>
+<script type="text/javascript">
+    $("#offname").blur(function () {
+        var offname=document.getElementById("offname").value
+        if(offname=="会员"){
+            alert("此折扣名称不可用！")
+            document.getElementById("offname").value=""
+        }
+
+    })
+</script>
+</html>

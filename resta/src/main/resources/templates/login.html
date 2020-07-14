@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>登录</title>
+
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+        body {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            margin: auto;
+        }
+        div {
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            position: absolute;
+            margin: auto;
+
+        }
+        #loginBox {
+            width: 500px;
+            height: 400px;
+            border: 1px solid #ccc900;
+            background: #2bbeee;
+            color: #333;
+            text-align: center;
+            font-size: 45px;
+        }
+        #loginButton {
+            width: 30px;
+            height: 40px;
+            border: 1px solid #ccc900;
+            background: #2bbeee;
+            color: #333;
+        }
+        #welcome {
+            width: 200px;
+            height: 100px;
+            background: #2bbeee;
+            color: #333;
+            font-size: 30px;
+            text-align: center;
+        }
+        #submit {
+            border: 0;
+            width:100px;
+            height: 50px;
+            border-radius: 6.6666666667px;
+            background: rgb(65, 59, 204);
+            color: #ccc900;
+            font-size: 25px;
+            position: relative;
+        }
+    </style>
+
+
+</head>
+<body>
+<form id="form" name="form" action="" method="post" th:action="@{/usercheak}">
+    <div id="loginBox">
+        <br>
+        请&nbsp&nbsp登&nbsp&nbsp录
+        <div id = "welcome" style="border-radius:10px">
+            <font color="#FF0000" size="3"><p th:text="${msg}" th:if="${not #strings.isEmpty(msg)}"></p></font>
+
+            用户名：<input type="text" name="username" id="username" size="20" required="required">
+    <hr>
+            密码：<input type="password" name="password" id="password" size="20" required="required">
+            <hr>
+            <input type = "submit" id="submit" value="登录">
+        </div>
+    </div>
+</form>
+
+
+</body>
+</html>

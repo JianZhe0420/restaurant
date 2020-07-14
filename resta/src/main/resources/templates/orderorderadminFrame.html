@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>orderoderadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<div id="block1" style="width: 20%;height: 100%;float: left">
+全部大订单：
+<br>
+<button onclick="全部大订单()">查询</button>
+<br>
+
+
+    <HR>
+根据菜品起止时间与菜品名称查询菜品销量：
+    <br>
+    起：<input id="菜品开始时间" type="date" class="change" placeholder="开始时间">
+    <br>
+    止：<input id="菜品终止时间" type="date" class="change" placeholder="终止时间">
+    <br>
+    <input id="菜品名称" class="change" placeholder="菜品名称">
+<br>
+<button onclick="菜品销量查询()">查询</button>
+<br>
+
+
+    <HR>
+根据起止时间查询大订单：
+    <br>
+    起：<input id="开始时间" type="date" class="change" placeholder="开始时间">
+    <br>
+    止：<input id="终止时间" type="date" class="change" placeholder="终止时间">
+    <br>
+<button onclick="根据起止时间查询订单()">查询</button>
+<br>
+
+
+
+    <HR>
+根据员工查询订单：
+    <br>
+    <input id="员工姓名" class="change" placeholder="员工姓名">
+    <br>
+<button onclick="根据员工查询订单()">查询</button>
+<br>
+    <HR>
+</div>
+<div id="block2" style="width: 80%;height: 100%;float: left">
+    <iframe id="msgFrame" name="msgFrame" style="height:600px;width:100%;" src="orderadminFrame" >
+    </iframe>
+</div>
+</body>
+
+<script th:inline="javascript">
+    function 全部大订单(){
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="orderadminFrame";
+        $(".change").val("")
+    }
+    function 菜品销量查询() {
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="subordersaleadminFrame?starttime="+document.getElementById("菜品开始时间").value+"&endtime="+document.getElementById("菜品终止时间").value+"&dishname="+document.getElementById("菜品名称").value;
+        $(".change").val("")
+    }
+    function 根据起止时间查询订单(){
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="ordertimeadminFrame?starttime="+document.getElementById("开始时间").value+"&endtime="+document.getElementById("终止时间").value;
+        $(".change").val("")
+    }
+    function 根据员工查询订单() {
+        document.getElementById("msgFrame").src="";
+        document.getElementById("msgFrame").src="orderbyuseradminFrame?username="+document.getElementById("员工姓名").value;
+        $(".change").val("")
+    }
+
+</script>
+</html>

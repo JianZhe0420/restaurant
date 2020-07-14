@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>adddishadminFrame</title>
+    <script src="jquery.min.js"></script>
+</head>
+<body>
+<form id="form" name="form" action="" method="post" th:action="@{/adddish}">
+    <div id="loginBox">
+        菜品名称：<input type="text" name="dishname" id="dishname" size="20" required="required">
+        <br>
+        库&nbsp&nbsp&nbsp&nbsp&nbsp存&nbsp：&nbsp<input type="text" name="dishstock" id="dishstock"  size="25" required="required">
+        <br>
+        价&nbsp&nbsp&nbsp&nbsp&nbsp格&nbsp：&nbsp<input type="text" name="dishprice" id="dishprice"  size="25" required="required">
+        <br>
+        <select id="dishtype" name="dishtype" style="float:left">
+            <option th:each="dishtype,dt:${dishtypelist}" th:selected="${dt.first}" th:value="${dishtype.getDishtypeid()}" th:text="${dishtype.getDishtypename()}"></option>
+        </select>
+        <br>
+        <select id="dishstatus" name="dishstatus" style="float:left">
+            <option selected="selected" value="上架">上架</option>
+            <option value="未上架">未上架</option>
+        </select>
+        <br>
+        <input type = "submit" id="submit" value="提交">
+    </div>
+</form>
+</body>
+<script th:inline="javascript">
+    $("#dishname").blur(function () {
+        var dishname=document.getElementById("dishname").value
+        if(dishname=="会员"){
+                alert("此菜品名称不可用！")
+            document.getElementById("dishname").value=""
+        }
+        if(dishname!=""&&dishname!="会员"){
+            $.ajax({
+                url: "cheakdishnameajax",
+                contentType: "applicaton/json;charset=UTF-8",
+                data: dishname,
+                dataType: "text",
+                type: "post",
+                cache: false,
+                success: function (data) {
+                    if (data == "in") {
+                        alert("此菜品已存在！")
+                        document.getElementById("dishname").value=""
+                    }
+                },
+                error() {
+                }
+            })
+        }
+    })
+</script>
+</html>
